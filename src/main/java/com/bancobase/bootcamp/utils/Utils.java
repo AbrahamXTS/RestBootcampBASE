@@ -1,11 +1,13 @@
 package com.bancobase.bootcamp.utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Utils {
 
     private Utils() throws InstantiationException {
-        throw new InstantiationException("The utility classes can not be instantiated");
+        throw new InstantiationException("The utility classes can't be instantiated");
     }
 
     private static final Random random = new Random();

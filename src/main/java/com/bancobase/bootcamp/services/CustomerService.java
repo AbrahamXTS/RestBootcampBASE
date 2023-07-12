@@ -1,18 +1,25 @@
 package com.bancobase.bootcamp.services;
 
-import com.bancobase.bootcamp.dto.*;
+import com.bancobase.bootcamp.dto.CustomerDTO;
+import com.bancobase.bootcamp.dto.CustomerInfoDTO;
 import com.bancobase.bootcamp.dto.request.PreCustomerInfo;
 import com.bancobase.bootcamp.exceptions.BusinessException;
 import com.bancobase.bootcamp.repositories.CustomerRepository;
-import com.bancobase.bootcamp.schemas.*;
+import com.bancobase.bootcamp.schemas.AccountSchema;
+import com.bancobase.bootcamp.schemas.CustomerSchema;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
+@Service
 public class CustomerService {
 
     private final AccountService accountService;
     private final CustomerRepository customerRepository;
 
+    @Autowired
     public CustomerService(AccountService accountService, CustomerRepository customerRepository) {
         this.accountService = accountService;
         this.customerRepository = customerRepository;
@@ -49,7 +56,7 @@ public class CustomerService {
         customer.setName(information.getName());
 
         CustomerSchema savedCustomer = customerRepository.save(customer);
-        List<AccountSchema> accounts = accountService.createAccount(savedCustomer);
+        List<AccountSchema> accounts = accountService.createAccountForANewCustomer(savedCustomer);
 
         return CustomerDTO.getFromSchema(customer, accounts);
     }
