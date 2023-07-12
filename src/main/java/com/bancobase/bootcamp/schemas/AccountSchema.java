@@ -1,7 +1,9 @@
 package com.bancobase.bootcamp.schemas;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -17,5 +19,6 @@ public class AccountSchema {
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnore
     private CustomerSchema customer;
 }
