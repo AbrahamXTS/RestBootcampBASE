@@ -1,17 +1,14 @@
 package com.bancobase.bootcamp.services;
 
-import com.bancobase.bootcamp.dto.CustomerDTO;
-import com.bancobase.bootcamp.dto.CustomerInfoDTO;
+import com.bancobase.bootcamp.dto.*;
 import com.bancobase.bootcamp.dto.request.PreCustomerInfo;
 import com.bancobase.bootcamp.exceptions.BusinessException;
 import com.bancobase.bootcamp.repositories.CustomerRepository;
-import com.bancobase.bootcamp.schemas.AccountSchema;
-import com.bancobase.bootcamp.schemas.CustomerSchema;
+import com.bancobase.bootcamp.schemas.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CustomerService {
@@ -26,10 +23,17 @@ public class CustomerService {
     }
 
     public CustomerInfoDTO getCustomerById(Long customerId) {
-        Optional<CustomerSchema> person = customerRepository
-                .findById(customerId);
+        Optional<CustomerSchema> customer = this
+                .customerRepository.findById(customerId);
 
-        return person.map(CustomerInfoDTO::getFromSchema).orElse(null);
+        if (customer.isEmpty()) {
+            throw BusinessException
+                    .builder()
+                    .message("Requested customer doesn't exist.")
+                    .build();
+        }
+
+        return customer.map(CustomerInfoDTO::getFromSchema).orElse(null);
     }
 
     public List<CustomerInfoDTO> filterCustomersByName(String name) {

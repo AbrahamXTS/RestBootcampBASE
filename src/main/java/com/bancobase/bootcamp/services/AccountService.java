@@ -2,16 +2,13 @@ package com.bancobase.bootcamp.services;
 
 import com.bancobase.bootcamp.dto.AccountDTO;
 import com.bancobase.bootcamp.exceptions.BusinessException;
-import com.bancobase.bootcamp.repositories.AccountRepository;
-import com.bancobase.bootcamp.repositories.CustomerRepository;
-import com.bancobase.bootcamp.schemas.AccountSchema;
-import com.bancobase.bootcamp.schemas.CustomerSchema;
+import com.bancobase.bootcamp.repositories.*;
+import com.bancobase.bootcamp.schemas.*;
 import com.bancobase.bootcamp.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AccountService {
@@ -33,6 +30,16 @@ public class AccountService {
     }
 
     public List<AccountDTO> getAllAccountsByCustomerId(Long customerId) {
+        Optional<CustomerSchema> customer = this
+                .customerRepository.findById(customerId);
+
+        if (customer.isEmpty()) {
+            throw BusinessException
+                    .builder()
+                    .message("Requested customer doesn't exist.")
+                    .build();
+        }
+
         return accountRepository
                 .findByCustomerCustomerId(customerId)
                 .stream()
