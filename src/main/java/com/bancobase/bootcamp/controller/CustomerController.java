@@ -1,14 +1,12 @@
 package com.bancobase.bootcamp.controller;
 
-import com.bancobase.bootcamp.dto.CustomerDTO;
-import com.bancobase.bootcamp.dto.CustomerInfoDTO;
+import com.bancobase.bootcamp.dto.*;
 import com.bancobase.bootcamp.dto.request.PreCustomerInfo;
 import com.bancobase.bootcamp.services.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +26,8 @@ public class CustomerController {
 
     @Operation(summary = "Get customer by id")
     @GetMapping("/{customerId}")
-    public ResponseEntity<CustomerInfoDTO> getCustomerById(@PathVariable Long customerId) {
-        CustomerInfoDTO customer = this.customerService.getCustomerById(customerId);
+    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long customerId) {
+        CustomerDTO customer = this.customerService.getCustomerById(customerId);
 
         return new ResponseEntity<>(customer, HttpStatus.OK);
     }

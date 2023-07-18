@@ -2,7 +2,7 @@ package com.bancobase.bootcamp.services;
 
 import com.bancobase.bootcamp.dto.*;
 import com.bancobase.bootcamp.dto.request.PreCustomerInfo;
-import com.bancobase.bootcamp.exceptions.BusinessException;
+import com.bancobase.bootcamp.exceptions.*;
 import com.bancobase.bootcamp.repositories.CustomerRepository;
 import com.bancobase.bootcamp.schemas.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,18 +22,22 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    public CustomerInfoDTO getCustomerById(Long customerId) {
+    public CustomerDTO getCustomerById(Long customerId) {
         Optional<CustomerSchema> customer = this
                 .customerRepository.findById(customerId);
 
         if (customer.isEmpty()) {
-            throw BusinessException
+            throw NotFoundException
                     .builder()
                     .message("Requested customer doesn't exist.")
                     .build();
         }
 
-        return customer.map(CustomerInfoDTO::getFromSchema).orElse(null);
+        return CustomerDTO
+                .builder()
+                .information(CustomerInfoDTO.getFromSchema(customer.get()))
+                .accounts(customer.get().getAccounts().stream().map(AccountDTO::getFromSchema).toList())
+                .build();
     }
 
     public List<CustomerInfoDTO> filterCustomersByName(String name) {

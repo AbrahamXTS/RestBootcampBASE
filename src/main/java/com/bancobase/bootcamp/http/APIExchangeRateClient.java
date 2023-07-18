@@ -1,6 +1,7 @@
 package com.bancobase.bootcamp.http;
 
 import com.bancobase.bootcamp.dto.response.*;
+import com.bancobase.bootcamp.exceptions.ServiceProviderException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -30,7 +31,10 @@ public class APIExchangeRateClient {
             return responseEntity.getBody();
         }
 
-        return null;
+        throw ServiceProviderException
+                .builder()
+                .message("Oh no! An error occurred while connecting to our exchange rate provider.")
+                .build();
     }
 
     public SymbolsNameResponse getSymbolsName() {
@@ -51,6 +55,9 @@ public class APIExchangeRateClient {
             return responseEntity.getBody();
         }
 
-        return null;
+        throw ServiceProviderException
+                .builder()
+                .message("Oh no! An error occurred while connecting to our exchange rate provider.")
+                .build();
     }
 }

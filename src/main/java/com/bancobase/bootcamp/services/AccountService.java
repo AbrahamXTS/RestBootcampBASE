@@ -1,7 +1,7 @@
 package com.bancobase.bootcamp.services;
 
 import com.bancobase.bootcamp.dto.AccountDTO;
-import com.bancobase.bootcamp.exceptions.BusinessException;
+import com.bancobase.bootcamp.exceptions.*;
 import com.bancobase.bootcamp.repositories.*;
 import com.bancobase.bootcamp.schemas.*;
 import com.bancobase.bootcamp.utils.Utils;
@@ -22,50 +22,22 @@ public class AccountService {
         this.customerRepository = customerRepository;
     }
 
-    public AccountDTO getAccountByAccountNumber(String accountNumber) {
-        Optional<AccountSchema> account = accountRepository
-                .findById(accountNumber);
-
-        return account.map(AccountDTO::getFromSchema).orElse(null);
-    }
-
     public List<AccountDTO> getAllAccountsByCustomerId(Long customerId) {
         Optional<CustomerSchema> customer = this
                 .customerRepository.findById(customerId);
 
         if (customer.isEmpty()) {
-            throw BusinessException
+            throw NotFoundException
                     .builder()
                     .message("Requested customer doesn't exist.")
                     .build();
         }
 
-        return accountRepository
-                .findByCustomerCustomerId(customerId)
+        return customer.get()
+                .getAccounts()
                 .stream()
                 .map(AccountDTO::getFromSchema)
                 .toList();
-    }
-
-    public List<AccountDTO> createAccountForAnExistingCustomer(Long customerId) {
-        Optional<CustomerSchema> customer = this
-                .customerRepository.findById(customerId);
-
-        if (customer.isEmpty()) {
-            throw BusinessException
-                    .builder()
-                    .message("Requested customer doesn't exist.")
-                    .build();
-        }
-
-        AccountSchema account = new AccountSchema();
-
-        account.setAccountNumber(Utils.generateAccountNumber());
-        account.setCustomer(customer.get());
-
-        AccountSchema savedAccount = accountRepository.save(account);
-
-        return List.of(AccountDTO.getFromSchema(savedAccount));
     }
 
     public List<AccountSchema> createAccountForANewCustomer(CustomerSchema customer) {
@@ -77,5 +49,48 @@ public class AccountService {
         AccountSchema savedAccount = accountRepository.save(account);
 
         return List.of(savedAccount);
+    }
+
+    public List<AccountDTO> createAccountForAnExistingCustomer(Long customerId) {
+        Optional<CustomerSchema> customer = this.customerRepository
+                .findById(customerId);
+
+        if (customer.isEmpty()) {
+            throw NotFoundException
+                    .builder()
+                    .message("Requested customer doesn't exist.")
+                    .build();
+        }
+
+        AccountSchema account = new AccountSchema();
+
+        account.setAccountNumber(Utils.generateAccountNumber());
+        account.setCustomer(customer.get());
+
+        AccountSchema savedAccount =
+                accountRepository.save(account);
+
+        return List.of(AccountDTO.getFromSchema(savedAccount));
+    }
+
+    public void deleteAccountByAccountNumber(String accountNumber) {
+        Optional<AccountSchema> account = accountRepository
+                .findById(accountNumber);
+
+        if (account.isEmpty()) {
+            throw NotFoundException
+                    .builder()
+                    .message("Requested account doesn't exist.")
+                    .build();
+        }
+
+        if (!(account.get().getBalance().equals(0.0))) {
+            throw BusinessException
+                    .builder()
+                    .message("The account balance must be zero.")
+                    .build();
+        }
+
+        accountRepository.deleteById(accountNumber);
     }
 }
